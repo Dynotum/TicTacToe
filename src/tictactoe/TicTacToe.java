@@ -3,70 +3,92 @@ package tictactoe;
 import java.util.*;
 
 public class TicTacToe {
-    final static String HORIZONTAL_BOUNDARIES = "---------";
-    final static String VERTICAL_BOUNDARIES = "|";
 
     public void startGame() {
         final Scanner sc = new Scanner(System.in);
+        final Field fieldBoard = new Field();
         System.out.print("Enter cells: ");
-//        final String inputString = sc.nextLine();
-        final String inputString = "X_X_O____";
+        final String inputString = sc.nextLine();
+//        final String inputString = "_XXOO_OX_";
 
         final char[][] matrix = fillMatrix(inputString);
-        printField(inputString);
 
-        System.out.println("Enter the coordinates:");
+        fieldBoard.printField(inputString);
 
-        boolean freetogo = true;
+
+        boolean freetogo = false;
         do {
-//            String getNextMove = sc.nextLine();
-            String getNextMove = "1 1";
+            System.out.println("Enter the coordinates:");
+            String getNextMove = sc.nextLine();
+//            String getNextMove = "2 3";
 
-            final List<Integer> coordinates = checkInput(getNextMove);
+            final Coordinates coordinates = checkInput(getNextMove);
 
-            if (coordinates.isEmpty()) {
-                //todo
-                // ya tengo los numeros ahora es comparar que las coordenadas
-                // no esten ocupadas
-
-//                checkCoordinates(coordinates, matrix);
-
+            String result = "";
+            if (coordinates.getRow() != -1) {
+                result = checkCoordinates(coordinates, matrix);
             }
 
+            if (!result.isEmpty()) {
+//                System.out.println("!!!!!!!!!!!!!!!!" + result);
+                fieldBoard.printField(result);
+                freetogo = true;
+            }
 
-        } while (freetogo);
+        } while (!freetogo);
 
 //        printResult(getResult(matrix, inputString));
     }
 
-    private void checkCoordinates(List<Integer> coordinates, char[][] matrix) {
-        // recuerda que estan invertidas
+    private String checkCoordinates(Coordinates coordinates, char[][] matrix) {
         // 1 1 -> 2 0
         // 1 3 -> 0 0
 
+        final int row = coordinates.getRow();
+        final int column = coordinates.getColumn();
+        final StringBuilder stringBuilder = new StringBuilder();
 
-        int coo1 = coordinates.get(0);
-        int coo2 = coordinates.get(1);
+        for (int i = 0, j = 2; i < 3 && j >= 0; i++, j--) {
+            for (int k = 0; k < 3; k++) {
+//                System.out.print(i + " " + k + "  ");
+//                System.out.print(k + " " + j);
+//                System.out.println();
+
+                if (k == row && j == column) {
+                    if (matrix[i][k] != '_') {
+                        System.out.println("This cell is occupied! Choose another one!");
+                        return "";
+                    }
+                    matrix[i][k] = 'X';
+
+//                    System.out.println("this is my guy = matrix = " + matrix[i][k]);
+                }
+                stringBuilder.append(matrix[i][k]);
+            }
+        }
+
+        return stringBuilder.toString();
 
     }
 
-    private List<Integer> checkInput(String nextLine) {
+    private Coordinates checkInput(String nextLine) {
         final String[] input = nextLine.split(" ");
-        final List<Integer> coordinates = new LinkedList<>();
+//        final List<Integer> coordinates = new LinkedList<>();
+        Coordinates coordinates = new Coordinates();
         try {
             final int number1 = Integer.parseInt(input[0]);
             final int number2 = Integer.parseInt(input[1]);
 
-            if (number1 <= 4 && number1 >= 0 && number2 <= 4  && number2 >= 0) {
+            if ((number1 < 1 || number1 > 3) || (number2 < 1 || number2 > 3)) {
                 System.out.println("Coordinates should be from 1 to 3!");
-                return Collections.emptyList();
+                return coordinates;
             }
-            coordinates.add(number1);
-            coordinates.add(number2);
+            coordinates.setRow(number1 - 1);
+            coordinates.setColumn(number2 - 1);
 
         } catch (NumberFormatException e) {
             System.out.println("You should enter numbers!");
-            return Collections.emptyList();
+            return coordinates;
         }
 
         return coordinates;
@@ -109,7 +131,6 @@ public class TicTacToe {
         if (checkImpossible(inputString)) {
             return 'i';
         }
-
 
         // rows
         for (int i = 0; i < 3; i++) {
@@ -185,43 +206,19 @@ public class TicTacToe {
             }
 //            System.out.println();
         }
-        return matrix;
-    }
 
-
-    public void printField(String inputString) {
-        char[] input = inputString.toCharArray();
-        int counter = 0;
-        final StringBuilder field = new StringBuilder();
-        System.out.println();
-        // X -> horizontal
-        // Y -> vertical
-        for (int y = 0; y < 4; y++) {
-            for (int x = 0; x < 9; x++) {
-                // append horizontal boundaries
-                if ((x == 0 && y == 0)) {
-                    field.append(HORIZONTAL_BOUNDARIES).append("\n");
-                    x = 9;
-                    continue;
-                }
-
-                if (x == 0) {
-                    field.append(VERTICAL_BOUNDARIES);
-                    continue;
-                }
-                if (x == 8 && y > 0) {
-                    field.append(VERTICAL_BOUNDARIES).append("\n");
-                    continue;
-                }
-
-                if (x % 2 == 0) {
-                    field.append(input[counter++]);
-                } else {
-                    field.append(" ");
-                }
+/*        System.out.println();
+        for (int n = 0, m = 2; m > -1; n++) {
+            System.out.print("( " + n + " , " + m + ")");
+            if (n == 2) {
+                m--;
+                n = -1;
+                System.out.println();
+//                System.out.print("( " + n + " , " + m + ")");
             }
-        }
-        System.out.println(field.append(HORIZONTAL_BOUNDARIES));
+        }*/
+
+        return matrix;
     }
 
 
