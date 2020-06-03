@@ -7,74 +7,57 @@ public class TicTacToe {
     public void startGame() {
         final Scanner sc = new Scanner(System.in);
         final Field fieldBoard = new Field();
-        System.out.print("Enter cells: ");
-        final String inputString = sc.nextLine();
-//        final String inputString = "_XXOO_OX_";
-
-        final char[][] matrix = fillMatrix(inputString);
-
-        fieldBoard.printField(inputString);
-
-
+        final String input = "_________";
+        final char[][] matrix = fillMatrix(input);
         boolean freetogo = false;
-        do {
-            System.out.println("Enter the coordinates:");
-            String getNextMove = sc.nextLine();
-//            String getNextMove = "2 3";
+        int counter = -1;
 
+        fieldBoard.printField(input);
+
+        do {
+            char inputUser = counter % 2 == 0 ? 'X' : 'O';
+            System.out.println("Enter the coordinates:");
+            final String getNextMove = sc.nextLine();
             final Coordinates coordinates = checkInput(getNextMove);
 
             String result = "";
             if (coordinates.getRow() != -1) {
-                result = checkCoordinates(coordinates, matrix);
+                result = checkCoordinates(coordinates, matrix, inputUser);
             }
 
             if (!result.isEmpty()) {
-//                System.out.println("!!!!!!!!!!!!!!!!" + result);
                 fieldBoard.printField(result);
-                freetogo = true;
+                freetogo = printResult(getResult(fillMatrix(result), input));
+                counter++;
             }
-
         } while (!freetogo);
-
-//        printResult(getResult(matrix, inputString));
     }
 
-    private String checkCoordinates(Coordinates coordinates, char[][] matrix) {
+    private String checkCoordinates(Coordinates coordinates, char[][] matrix, char inputUser) {
         // 1 1 -> 2 0
         // 1 3 -> 0 0
-
         final int row = coordinates.getRow();
         final int column = coordinates.getColumn();
         final StringBuilder stringBuilder = new StringBuilder();
 
         for (int i = 0, j = 2; i < 3 && j >= 0; i++, j--) {
             for (int k = 0; k < 3; k++) {
-//                System.out.print(i + " " + k + "  ");
-//                System.out.print(k + " " + j);
-//                System.out.println();
-
                 if (k == row && j == column) {
                     if (matrix[i][k] != '_') {
                         System.out.println("This cell is occupied! Choose another one!");
                         return "";
                     }
-                    matrix[i][k] = 'X';
-
-//                    System.out.println("this is my guy = matrix = " + matrix[i][k]);
+                    matrix[i][k] = inputUser;
                 }
                 stringBuilder.append(matrix[i][k]);
             }
         }
-
         return stringBuilder.toString();
-
     }
 
     private Coordinates checkInput(String nextLine) {
         final String[] input = nextLine.split(" ");
-//        final List<Integer> coordinates = new LinkedList<>();
-        Coordinates coordinates = new Coordinates();
+        final Coordinates coordinates = new Coordinates();
         try {
             final int number1 = Integer.parseInt(input[0]);
             final int number2 = Integer.parseInt(input[1]);
@@ -94,23 +77,23 @@ public class TicTacToe {
         return coordinates;
     }
 
-
-    private void printResult(char result) {
+    private boolean printResult(char result) {
         switch (result) {
             case 'X':
             case 'O':
                 System.out.println(result + " wins");
-                break;
+                return true;
             case 'd':
                 System.out.println("Draw");
-                break;
+                return true;
             case 'g':
                 System.out.println("Game not finished");
-                break;
+                return true;
             case 'i':
                 System.out.println("Impossible");
-                break;
+                return true;
         }
+        return false;
     }
 
     private boolean checkImpossible(String impossible2) {
@@ -160,16 +143,20 @@ public class TicTacToe {
             return matrix[1][1];
         }
 
+        int counter = 0;
         for (char[] row : matrix) {
             for (char col : row) {
                 if (col == '_') {
-                    return 'g';
+                    counter++;
                 }
             }
         }
+        //return draw
+        if (counter == 0) {
+            return 'd';
+        }
 
-        // return draw
-        return 'd';
+        return 'h';
     }
 
     private boolean checkAgainCol(char[][] matrix, char elementFound) {
@@ -185,7 +172,6 @@ public class TicTacToe {
     private boolean checkAgainRows(char[][] matrix, char elementFound) {
         // rows
         for (int i = 0; i < 3; i++) {
-//            System.out.println(elementFound);
             if (matrix[i][1] != elementFound && matrix[i][1] == matrix[i][0] &&
                     matrix[i][1] == matrix[i][2]) {
                 return true;
@@ -202,22 +188,8 @@ public class TicTacToe {
         for (int n = 0; n < 3; n++) {
             for (int m = 0; m < 3; m++) {
                 matrix[n][m] = input[counter++];
-//                System.out.print(matrix[n][m]);
             }
-//            System.out.println();
         }
-
-/*        System.out.println();
-        for (int n = 0, m = 2; m > -1; n++) {
-            System.out.print("( " + n + " , " + m + ")");
-            if (n == 2) {
-                m--;
-                n = -1;
-                System.out.println();
-//                System.out.print("( " + n + " , " + m + ")");
-            }
-        }*/
-
         return matrix;
     }
 
